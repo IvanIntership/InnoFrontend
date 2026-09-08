@@ -1,9 +1,10 @@
 import './App.css'
+import { OfficesPage } from './pages/OfficesPage'
 
 function App() {
   return (
-    <div className="container">
-      <h1>InnoClinic</h1>
+    <div>
+      <OfficesPage />
     </div>
   )
 }

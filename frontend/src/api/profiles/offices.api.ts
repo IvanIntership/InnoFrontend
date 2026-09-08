@@ -23,5 +23,10 @@ export const officesApi = {
   search: async (dto: Dtos.SearchQueryDto): Promise<Dtos.OfficeDto[]> => {
     const response = await apiClient.post<Dtos.OfficeDto[]>('/offices/search', dto);
     return response.data;
+  },
+
+  searchPaged: async (dto: Dtos.SearchPagedOfficeDto): Promise<Dtos.PagedResult<Dtos.OfficeDto>> => {
+    const response = await apiClient.post<Dtos.PagedResult<Dtos.OfficeDto>>('/offices/search/paged', dto);
+    return response.data;
   }
 };

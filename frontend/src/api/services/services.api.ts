@@ -39,5 +39,10 @@ export const servicesApi = {
   searchByTerm: async (dto: Dtos.SearchByTermDto): Promise<Dtos.ServiceDto[]> => {
     const response = await apiClient.post<Dtos.ServiceDto[]>('/services/searchByTerm', dto);
     return response.data;
+  },
+
+  searchPaged: async (dto: Dtos.GetPagedServicesDto): Promise<Dtos.PagedResult<Dtos.ServiceDto>> => {
+    const response = await apiClient.post<Dtos.PagedResult<Dtos.ServiceDto>>('/services/search/paged', dto);
+    return response.data;
   }
 };
