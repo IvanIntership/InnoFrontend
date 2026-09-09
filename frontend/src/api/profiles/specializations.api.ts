@@ -23,5 +23,10 @@ export const specializationsApi = {
   search: async (dto: Dtos.SearchQueryDto): Promise<Dtos.SpecializationDto[]> => {
     const response = await apiClient.post<Dtos.SpecializationDto[]>('/specializations/search', dto);
     return response.data;
+  },
+
+  searchPaged: async (dto: Dtos.SearchPagedSpecializationDto): Promise<Dtos.PagedResult<Dtos.SpecializationDto>> => {
+    const response = await apiClient.post<Dtos.PagedResult<Dtos.SpecializationDto>>('/specializations/search/paged', dto);
+    return response.data;
   }
 };

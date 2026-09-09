@@ -33,5 +33,10 @@ export const patientsApi = {
   search: async (dto: Dtos.SearchFilteredPatientListDto): Promise<Dtos.PatientDto[]> => {
     const response = await apiClient.post<Dtos.PatientDto[]>('/patients/search', dto);
     return response.data;
+  },
+
+  searchPaged: async (dto: Dtos.SearchPagedPatientDto): Promise<Dtos.PagedResult<Dtos.PatientDto>> => {
+    const response = await apiClient.post<Dtos.PagedResult<Dtos.PatientDto>>('/patients/search/paged', dto);
+    return response.data;
   }
 };

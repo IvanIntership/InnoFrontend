@@ -33,5 +33,10 @@ export const administratorsApi = {
   search: async (dto: Dtos.SearchFilteredAdministratorListDto): Promise<Dtos.AdministratorDto[]> => {
     const response = await apiClient.post<Dtos.AdministratorDto[]>('/administrators/search', dto);
     return response.data;
+  },
+
+  searchPaged: async (dto: Dtos.SearchPagedAdministratorDto): Promise<Dtos.PagedResult<Dtos.AdministratorDto>> => {
+    const response = await apiClient.post<Dtos.PagedResult<Dtos.AdministratorDto>>('/administrators/search/paged', dto);
+    return response.data;
   }
 };
