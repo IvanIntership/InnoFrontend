@@ -1,39 +1,33 @@
 import { useState } from 'react';
 import { 
-  Button, TextField, Table, TableBody, TableCell, 
-  TableHead, TableRow, Pagination, Stack, Typography, 
-  CircularProgress, IconButton, Paper, Box
+  Button, TextField, Pagination, 
+  Stack, Typography, Box 
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 
 import { useOffices } from '../hooks/useOffices';
-import { OfficeDialog } from '../components/OfficeDialog';
-import type * as Dtos from '../api/types';
+import { OfficeModalWindow } from '../components/OfficeDialog';
+import { OfficeTable } from '../components/OfficeTable';
 
 export const OfficesPage = () => {
   const { 
     offices, isLoading, error, searchParams, totalCount,
-    createOffice, updateOffice, deleteOffice, 
+    createOffice, deleteOffice, 
     handleSearchChange, handlePageChange 
   } = useOffices();
 
   const [isOpen, setIsOpen] = useState(false);
-  const [editingOffice, setEditingOffice] = useState<Dtos.OfficeDto | null>(null);
 
-  const handleSave = async (data: any) => {
-    if (editingOffice) await updateOffice(data);
-    else await createOffice(data);
+  const handleSave = async (data: any, file: File | null) => {
+    await createOffice(data, file);
   };
 
   const totalPages = Math.ceil(totalCount / (searchParams.pageSize || 10));
 
   return (
     <Box sx={{ p: 4, maxWidth: '1000px', margin: '0 auto' }}>
-      
       <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">Offices</Typography>
-        <Button variant="contained" onClick={() => { setEditingOffice(null); setIsOpen(true); }}>
+        <Button variant="contained" onClick={() => setIsOpen(true)}>
           Create Office
         </Button>
       </Stack>
@@ -48,41 +42,11 @@ export const OfficesPage = () => {
         />
       </Stack>
 
-      <Paper elevation={2}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Address</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            
-            {isLoading && offices.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={3} align="center"><CircularProgress /></TableCell>
-              </TableRow>
-            )}
-
-            {!isLoading && offices.map((office) => (
-              <TableRow key={office.id}>
-                <TableCell>{office.address}</TableCell>
-                <TableCell>{office.phoneNumber}</TableCell>
-                <TableCell align="right">
-                  <IconButton color="primary" onClick={() => { setEditingOffice(office); setIsOpen(true); }}>
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton color="error" onClick={() => deleteOffice(office.id)}>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-
-          </TableBody>
-        </Table>
-      </Paper>
+      <OfficeTable 
+        offices={offices} 
+        isLoading={isLoading} 
+        onDelete={deleteOffice} 
+      />
 
       {totalPages > 1 && (
         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
@@ -95,9 +59,9 @@ export const OfficesPage = () => {
         </Box>
       )}
 
-      <OfficeDialog
+      <OfficeModalWindow
         open={isOpen}
-        officeToEdit={editingOffice}
+        officeToEdit={null}
         onClose={() => setIsOpen(false)}
         onSubmit={handleSave}
       />

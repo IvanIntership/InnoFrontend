@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Stack } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Stack, Typography } from '@mui/material';
 import type * as Dtos from '../api/types';
 
-interface Props {
+interface OfficeModalWindowProps {
   open: boolean;
   officeToEdit: Dtos.OfficeDto | null;
   onClose: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: any, file: File | null) => void; 
 }
 
-export const OfficeDialog: React.FC<Props> = ({ open, officeToEdit, onClose, onSubmit }) => {
+export const OfficeModalWindow: React.FC<OfficeModalWindowProps> = ({ open, officeToEdit, onClose, onSubmit }) => {
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
+  const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (officeToEdit) {
@@ -21,6 +22,7 @@ export const OfficeDialog: React.FC<Props> = ({ open, officeToEdit, onClose, onS
       setAddress('');
       setPhone('');
     }
+    setFile(null); 
   }, [officeToEdit, open]);
 
   const handleSave = () => {
@@ -28,7 +30,9 @@ export const OfficeDialog: React.FC<Props> = ({ open, officeToEdit, onClose, onS
       id: officeToEdit?.id,
       address: address,
       phoneNumber: phone,
-    });
+      photoId: officeToEdit?.photoId,
+    }, file);
+    
     onClose();
   };
 
@@ -37,7 +41,7 @@ export const OfficeDialog: React.FC<Props> = ({ open, officeToEdit, onClose, onS
       <DialogTitle>{officeToEdit ? 'Edit Office' : 'Create Office'}</DialogTitle>
       
       <DialogContent>
-        <Stack spacing={2} sx={{ mt: 1 }}>
+        <Stack spacing={3} sx={{ mt: 1 }}>
           <TextField 
             label="Address" 
             value={address} 
@@ -48,11 +52,28 @@ export const OfficeDialog: React.FC<Props> = ({ open, officeToEdit, onClose, onS
             value={phone} 
             onChange={(e) => setPhone(e.target.value)} 
           />
+          
+          <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+            <Button variant="outlined" component="label">
+              Upload Photo
+              <input 
+                type="file" 
+                hidden 
+                accept="image/*" 
+                onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} 
+              />
+            </Button>
+            <Typography variant="body2" color="textSecondary">
+              {file ? file.name : (officeToEdit?.photoId ? 'Photo already uploaded' : 'No file selected')}
+            </Typography>
+          </Stack>
         </Stack>
       </DialogContent>
   
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+      <Button variant="outlined" color="error" onClick={onClose}>
+        Cancel
+      </Button>
         <Button variant="contained" onClick={handleSave}>Save</Button>
       </DialogActions>
     </Dialog>
