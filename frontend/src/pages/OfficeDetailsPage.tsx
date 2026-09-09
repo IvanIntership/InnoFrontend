@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Box, Button, Typography, Paper, CircularProgress, Stack, Avatar, Skeleton } from '@mui/material';
+import { Box, Button, Typography, Paper, CircularProgress, Stack, Avatar, Skeleton, Snackbar, Alert } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 
@@ -15,8 +15,11 @@ export const OfficeDetailsPage = () => {
   
   const [office, setOffice] = useState<Dtos.OfficeDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const clearError = () => setError(null);
 
   useEffect(() => {
     if (!id) return;
@@ -27,7 +30,7 @@ export const OfficeDetailsPage = () => {
     setIsLoading(true);
     officesApi.getById(id!)
       .then((data) => setOffice(data))
-      .catch((err) => console.error('Office loading error', err))
+      .catch((err: any) => setError(err?.response?.data?.detail || err?.response?.data?.title || err?.message || 'Office loading error'))
       .finally(() => setIsLoading(false));
   };
 
@@ -43,8 +46,8 @@ export const OfficeDetailsPage = () => {
 
       setIsEditModalOpen(false);
       fetchOfficeData(); 
-    } catch (error) {
-      console.error('Updating error', error);
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || err?.response?.data?.title || err?.message || 'Updating error');
     }
   };
 
@@ -69,7 +72,7 @@ export const OfficeDetailsPage = () => {
 
       <Paper elevation={3} sx={{ p: 4 }}>
         <Stack spacing={3} sx={{ alignItems: 'center' }}>
-            <PhotoAvatar photoId={office.photoId} />
+            <PhotoAvatar photoId={office.photoId} onError={setError} />
             
             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
             {office.address}
@@ -79,7 +82,7 @@ export const OfficeDetailsPage = () => {
             Phone: {office.phoneNumber}
             </Typography>
         </Stack>
-    </Paper>
+      </Paper>
 
       <OfficeModalWindow
         open={isEditModalOpen}
@@ -87,11 +90,17 @@ export const OfficeDetailsPage = () => {
         onClose={() => setIsEditModalOpen(false)}
         onSubmit={handleEditSubmit}
       />
+
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={clearError} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <Alert onClose={clearError} severity="error" variant="filled" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
 
-const PhotoAvatar = ({ photoId }: { photoId?: string | null }) => {
+const PhotoAvatar = ({ photoId, onError }: { photoId?: string | null, onError: (msg: string) => void }) => {
     const [imgUrl, setImgUrl] = useState<string | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(false);
   
@@ -105,8 +114,8 @@ const PhotoAvatar = ({ photoId }: { photoId?: string | null }) => {
           const blob = await photosApi.getById(photoId);
           objectUrl = URL.createObjectURL(blob);
           setImgUrl(objectUrl);
-        } catch (error) {
-          console.error('Photo loading error');
+        } catch (err: any) {
+          onError(err?.response?.data?.detail || err?.response?.data?.title || err?.message || 'Photo loading error');
         } finally {
           setIsLoading(false);
         }
@@ -117,7 +126,7 @@ const PhotoAvatar = ({ photoId }: { photoId?: string | null }) => {
       return () => {
         if (objectUrl) URL.revokeObjectURL(objectUrl);
       };
-    }, [photoId]);
+    }, [photoId, onError]);
   
     if (isLoading) return <Skeleton variant="rounded" width={200} height={200} />;
     
@@ -129,4 +138,4 @@ const PhotoAvatar = ({ photoId }: { photoId?: string | null }) => {
         sx={{ width: 200, height: 200, boxShadow: 2 }}
       />
     );
-  };
+};

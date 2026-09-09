@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { 
   Button, TextField, Pagination, 
-  Stack, Typography, Box 
+  Stack, Typography, Box, Snackbar, Alert 
 } from '@mui/material';
 
 import { useOffices } from '../hooks/useOffices';
@@ -12,7 +12,7 @@ export const OfficesPage = () => {
   const { 
     offices, isLoading, error, searchParams, totalCount,
     createOffice, deleteOffice, 
-    handleSearchChange, handlePageChange 
+    handleSearchChange, handlePageChange, clearError
   } = useOffices();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +33,6 @@ export const OfficesPage = () => {
       </Stack>
 
       <Stack spacing={2} sx={{ mb: 3 }}>
-        {error && <Typography color="error">{error}</Typography>}
         <TextField 
           label="Search offices..." 
           size="small"
@@ -65,6 +64,11 @@ export const OfficesPage = () => {
         onClose={() => setIsOpen(false)}
         onSubmit={handleSave}
       />
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={clearError} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+        <Alert onClose={clearError} severity="error" variant="filled" sx={{ width: '100%' }}>
+          {error}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

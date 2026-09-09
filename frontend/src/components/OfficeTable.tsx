@@ -35,7 +35,7 @@ export const OfficeTable: React.FC<OfficeTableProps> = ({ offices, isLoading, on
             </TableRow>
           )}
 
-          {!isLoading && offices.map((office) => (
+          {offices.map((office) => (
             <TableRow 
               key={office.id} 
               hover
