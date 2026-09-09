@@ -6,6 +6,7 @@ import type * as Dtos from './../api/types';
 export const useOffices = () => {
   const [offices, setOffices] = useState<Dtos.OfficeDto[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const clearError = () => setError(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,6 +17,14 @@ export const useOffices = () => {
     pageSize: 10,
   });
 
+
+  const getErrorMessage = (err: any): string => {
+    return err?.response?.data?.detail
+        || err?.response?.data?.title
+        || err?.message
+        || 'Unknown error';
+  };
+
   const getOffices = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -24,7 +33,7 @@ export const useOffices = () => {
       setOffices(data.items);
       setTotalCount(data.totalCount);
     } catch (err: any) {
-      setError(err?.message || 'Error during offices loading');
+      setError(getErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -39,7 +48,7 @@ export const useOffices = () => {
     try {
       return await officesApi.getById(id);
     } catch (err: any) {
-      setError(err?.message || 'Error during office loading');
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setIsLoading(false);
@@ -59,7 +68,7 @@ export const useOffices = () => {
       await officesApi.create({ ...dto, photoId });
       await getOffices();
     } catch (err: any) {
-      setError(err?.message || 'Office creating error');
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setIsLoading(false);
@@ -79,7 +88,7 @@ export const useOffices = () => {
       await officesApi.update({ ...dto, photoId });
       await getOffices();
     } catch (err: any) {
-      setError(err?.message || 'Office updating error');
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setIsLoading(false);
@@ -97,7 +106,7 @@ export const useOffices = () => {
         await getOffices();
       }
     } catch (err: any) {
-      setError(err?.response?.data?.message || err?.message || 'Office deleting error');
+      setError(getErrorMessage(err));
       throw err;
     } finally {
       setIsLoading(false);
@@ -122,6 +131,7 @@ export const useOffices = () => {
     isLoading,
     error,
     searchParams,
+    clearError,
 
     getOffices,
     getOfficeById,
