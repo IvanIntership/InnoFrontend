@@ -17,6 +17,14 @@ export const useOffices = () => {
     pageSize: 10,
   });
 
+
+  const getErrorMessage = (err: any): string => {
+    return err?.response?.data?.detail
+        || err?.response?.data?.title
+        || err?.message
+        || 'Unknown error';
+  };
+
   const getOffices = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -115,13 +123,6 @@ export const useOffices = () => {
   
   const handlePageSizeChange = (newPageSize: number) => {
     setSearchParams(prev => ({ ...prev, pageSize: newPageSize, pageNumber: 1 }));
-  };
-
-  const getErrorMessage = (err: any): string => {
-    return err?.response?.data?.detail
-        || err?.response?.data?.title
-        || err?.message
-        || 'Unknown error';
   };
 
   return {
