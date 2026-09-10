@@ -7,34 +7,18 @@ import {
 import { useServiceCategories } from '../hooks/useServiceCategories';
 import { ServiceCategoryDialog } from '../components/ServiceCategoryDialog';
 import { ServiceCategoryTable } from '../components/ServiceCategoryTable';
-import type * as Dtos from '../api/types';
 
 export const ServiceCategoriesPage = () => {
   const { 
     categories, isLoading, error, searchParams, totalCount,
-    createCategory, updateCategory, deleteCategory, 
+    createCategory, deleteCategory, 
     handleSearchChange, handlePageChange, clearError
   } = useServiceCategories();
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [categoryToEdit, setCategoryToEdit] = useState<Dtos.ServiceCategoryDto | null>(null);
-
-  const handleOpenCreate = () => {
-    setCategoryToEdit(null);
-    setIsDialogOpen(true);
-  };
-
-  const handleOpenEdit = (category: Dtos.ServiceCategoryDto) => {
-    setCategoryToEdit(category);
-    setIsDialogOpen(true);
-  };
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSave = async (data: any) => {
-    if (categoryToEdit) {
-      await updateCategory(data);
-    } else {
-      await createCategory(data);
-    }
+    await createCategory(data);
   };
 
   const totalPages = Math.ceil(totalCount / (searchParams.pageSize || 10));
@@ -43,7 +27,7 @@ export const ServiceCategoriesPage = () => {
     <Box sx={{ p: 4, maxWidth: '1000px', margin: '0 auto' }}>
       <Stack direction="row" sx={{ justifyContent: 'space-between', mb: 3 }}>
         <Typography variant="h4">Service Categories</Typography>
-        <Button variant="contained" onClick={handleOpenCreate}>
+        <Button variant="contained" onClick={() => setIsOpen(true)}>
           Create Category
         </Button>
       </Stack>
@@ -60,7 +44,6 @@ export const ServiceCategoriesPage = () => {
       <ServiceCategoryTable 
         categories={categories} 
         isLoading={isLoading} 
-        onEdit={handleOpenEdit}
         onDelete={deleteCategory} 
       />
 
@@ -76,12 +59,11 @@ export const ServiceCategoriesPage = () => {
       )}
 
       <ServiceCategoryDialog
-        open={isDialogOpen}
-        categoryToEdit={categoryToEdit}
-        onClose={() => setIsDialogOpen(false)}
+        open={isOpen}
+        categoryToEdit={null}
+        onClose={() => setIsOpen(false)}
         onSubmit={handleSave}
       />
-
       <Snackbar open={!!error} autoHideDuration={6000} onClose={clearError} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
         <Alert onClose={clearError} severity="error" variant="filled" sx={{ width: '100%' }}>
           {error}

@@ -1,20 +1,21 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Table, TableBody, TableCell, TableHead, 
   TableRow, CircularProgress, IconButton, Paper 
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import type * as Dtos from '../api/types';
 
 export interface ServiceCategoryTableProps {
   categories: Dtos.ServiceCategoryDto[];
   isLoading: boolean;
-  onEdit: (category: Dtos.ServiceCategoryDto) => void;
   onDelete: (id: string) => void;
 }
 
-export const ServiceCategoryTable: React.FC<ServiceCategoryTableProps> = ({ categories, isLoading, onEdit, onDelete }) => {
+export const ServiceCategoryTable: React.FC<ServiceCategoryTableProps> = ({ categories, isLoading, onDelete }) => {
+  const navigate = useNavigate();
+
   return (
     <Paper elevation={2}>
       <Table>
@@ -34,24 +35,22 @@ export const ServiceCategoryTable: React.FC<ServiceCategoryTableProps> = ({ cate
             </TableRow>
           )}
 
-          {categories.map((category) => (
+          {!isLoading && categories.map((category) => (
             <TableRow 
               key={category.id} 
               hover
-              sx={{ opacity: isLoading ? 0.5 : 1, pointerEvents: isLoading ? 'none' : 'auto' }}
+              sx={{ cursor: 'pointer' }}
+              onClick={() => navigate(`/categories/${category.id}`)}
             >
               <TableCell>{category.name}</TableCell>
               <TableCell>{category.duration}</TableCell>
               <TableCell align="right">
                 <IconButton 
-                  color="primary" 
-                  onClick={() => onEdit(category)}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton 
                   color="error" 
-                  onClick={() => onDelete(category.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(category.id);
+                  }}
                 >
                   <DeleteIcon />
                 </IconButton>

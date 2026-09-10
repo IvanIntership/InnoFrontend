@@ -5,10 +5,11 @@ import type * as Dtos from './../api/types';
 export const useServiceCategories = () => {
   const [categories, setCategories] = useState<Dtos.ServiceCategoryDto[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const clearError = () => setError(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const clearError = () => setError(null);
 
   const [searchParams, setSearchParams] = useState<Dtos.GetPagedServiceCategoriesDto>({
     term: '',
@@ -40,6 +41,19 @@ export const useServiceCategories = () => {
   useEffect(() => {
     getCategories();
   }, [getCategories]);
+
+  // ОБЕРНУЛИ В useCallback, ЧТОБЫ НЕ БЫЛО БЕСКОНЕЧНОГО ЦИКЛА RE-RENDER
+  const getCategoryById = useCallback(async (id: string): Promise<Dtos.ServiceCategoryDto> => {
+    setIsLoading(true);
+    try {
+      return await serviceCategoriesApi.getById(id);
+    } catch (err: any) {
+      setError(getErrorMessage(err));
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const createCategory = async (dto: Dtos.AddServiceCategoryDto) => {
     setIsLoading(true);
@@ -102,6 +116,7 @@ export const useServiceCategories = () => {
     clearError,
 
     getCategories,
+    getCategoryById,
     createCategory,
     updateCategory,
     deleteCategory,
