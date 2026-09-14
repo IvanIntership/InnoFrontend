@@ -1,17 +1,16 @@
 import { useState, useCallback, useEffect } from "react";
-import { serviceCategoriesApi } from "../api/services/serviceCategories.api";
-import type * as Dtos from './../api/types';
+import { servicesApi } from "../api/services/services.api";
+import type * as Dtos from '../api/types';
 
-export const useServiceCategories = () => {
-  const [categories, setCategories] = useState<Dtos.ServiceCategoryDto[]>([]);
+export const useServices = () => {
+  const [services, setServices] = useState<Dtos.ServiceDto[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const clearError = () => setError(null);
 
-  const [searchParams, setSearchParams] = useState<Dtos.GetPagedServiceCategoriesDto>({
+  const [searchParams, setSearchParams] = useState<Dtos.GetPagedServicesDto>({
     term: '',
     pageNumber: 1,
     pageSize: 10,
@@ -24,12 +23,12 @@ export const useServiceCategories = () => {
         || 'Unknown error';
   };
 
-  const getCategories = useCallback(async () => {
+  const getServices = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await serviceCategoriesApi.searchPaged(searchParams);
-      setCategories(data.items);
+      const data = await servicesApi.searchPaged(searchParams);
+      setServices(data.items);
       setTotalCount(data.totalCount);
     } catch (err: any) {
       setError(getErrorMessage(err));
@@ -39,13 +38,13 @@ export const useServiceCategories = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    getCategories();
-  }, [getCategories]);
+    getServices();
+  }, [getServices]);
 
-  const getCategoryById = useCallback(async (id: string): Promise<Dtos.ServiceCategoryDto> => {
+  const getServiceById = useCallback(async (id: string): Promise<Dtos.ServiceDto> => {
     setIsLoading(true);
     try {
-      return await serviceCategoriesApi.getById(id);
+      return await servicesApi.getById(id);
     } catch (err: any) {
       setError(getErrorMessage(err));
       throw err;
@@ -54,11 +53,11 @@ export const useServiceCategories = () => {
     }
   }, []);
 
-  const createCategory = async (dto: Dtos.AddServiceCategoryDto) => {
+  const createService = async (dto: Dtos.AddServiceDto) => {
     setIsLoading(true);
     try {
-      await serviceCategoriesApi.create(dto);
-      await getCategories();
+      await servicesApi.create(dto);
+      await getServices();
     } catch (err: any) {
       setError(getErrorMessage(err));
       throw err;
@@ -67,11 +66,11 @@ export const useServiceCategories = () => {
     }
   };
 
-  const updateCategory = async (dto: Dtos.UpdateServiceCategoryDto) => {
+  const updateService = async (dto: Dtos.UpdateServiceDto) => {
     setIsLoading(true);
     try {
-      await serviceCategoriesApi.update(dto);
-      await getCategories();
+      await servicesApi.update(dto);
+      await getServices();
     } catch (err: any) {
       setError(getErrorMessage(err));
       throw err;
@@ -80,15 +79,15 @@ export const useServiceCategories = () => {
     }
   };
 
-  const deleteCategory = async (id: string) => {
+  const deleteService = async (id: string) => {
     setIsLoading(true);
     try {
-      await serviceCategoriesApi.delete(id);
+      await servicesApi.delete(id);
       
-      if (categories.length === 1 && searchParams.pageNumber && searchParams.pageNumber > 1) {
+      if (services.length === 1 && searchParams.pageNumber && searchParams.pageNumber > 1) {
         setSearchParams(prev => ({ ...prev, pageNumber: prev.pageNumber! - 1 }));
       } else {
-        await getCategories();
+        await getServices();
       }
     } catch (err: any) {
       setError(getErrorMessage(err));
@@ -105,24 +104,24 @@ export const useServiceCategories = () => {
   const handlePageChange = (newPage: number) => {
     setSearchParams(prev => ({ ...prev, pageNumber: newPage }));
   };
-
+  
   const handlePageSizeChange = (newPageSize: number) => {
     setSearchParams(prev => ({ ...prev, pageSize: newPageSize, pageNumber: 1 }));
   };
-  
+
   return {
-    categories,
+    services,
     totalCount,
     isLoading,
     error,
     searchParams,
     clearError,
 
-    getCategories,
-    getCategoryById,
-    createCategory,
-    updateCategory,
-    deleteCategory,
+    getServices,
+    getServiceById,
+    createService,
+    updateService,
+    deleteService,
     
     handleSearchChange,
     handlePageChange,
