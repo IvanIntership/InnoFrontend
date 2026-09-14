@@ -42,7 +42,6 @@ export const useServiceCategories = () => {
     getCategories();
   }, [getCategories]);
 
-  // ОБЕРНУЛИ В useCallback, ЧТОБЫ НЕ БЫЛО БЕСКОНЕЧНОГО ЦИКЛА RE-RENDER
   const getCategoryById = useCallback(async (id: string): Promise<Dtos.ServiceCategoryDto> => {
     setIsLoading(true);
     try {

@@ -3,7 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { OfficesPage } from './pages/OfficesPage';
 import { OfficeDetailsPage } from './pages/OfficeDetailsPage';
 import { ServiceCategoriesPage } from './pages/ServiceCategoriesPage';
-import { ServiceCategoryDetailsPage } from './pages/ServiceCategoryDetailsPage'; // 1. Импортируем страницу деталей
+import { ServiceCategoryDetailsPage } from './pages/ServiceCategoryDetailsPage';
 
 function App() {
   return (
@@ -12,7 +12,7 @@ function App() {
       <Route path="/offices" element={<OfficesPage />} />
       <Route path="/offices/:id" element={<OfficeDetailsPage />} />
       <Route path="/categories" element={<ServiceCategoriesPage />} />
-      <Route path="/categories/:id" element={<ServiceCategoryDetailsPage />} /> {/* 2. Добавляем детальную страницу */}
+      <Route path="/categories/:id" element={<ServiceCategoryDetailsPage />} />
     </Routes>
   );
 }
