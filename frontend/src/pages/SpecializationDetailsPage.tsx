@@ -2,13 +2,14 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Box, Button, Typography, Paper, 
-  CircularProgress, Stack, Snackbar, Alert 
+  CircularProgress, Stack, Snackbar, Alert,
+  List, ListItem, ListItemText 
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
-
 import { useSpecializations } from '../hooks/useSpecializations';
 import { SpecializationModalWindow } from '../components/SpecializationModalWindow';
+import { servicesApi } from '../api/services/services.api';
 import type * as Dtos from '../api/types';
 
 export const SpecializationDetailsPage = () => {
@@ -21,12 +22,19 @@ export const SpecializationDetailsPage = () => {
   } = useSpecializations();
 
   const [specialization, setSpecialization] = useState<Dtos.SpecializationDto | null>(null);
+  const [services, setServices] = useState<Dtos.ServiceDto[]>([]);
+  const [isServicesLoading, setIsServicesLoading] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const fetchSpecialization = useCallback(async () => {
     if (id) {
       const data = await getSpecializationById(id);
       setSpecialization(data);
+      setIsServicesLoading(true);
+      servicesApi.getBySpecializationId(id)
+        .then(data => setServices(data))
+        .catch(err => console.error("Failed to load services", err))
+        .finally(() => setIsServicesLoading(false));
     }
   }, [id, getSpecializationById]);
 
@@ -79,9 +87,38 @@ export const SpecializationDetailsPage = () => {
         </Box>
 
         <Box sx={{ mt: 4, pt: 4, borderTop: '1px solid #eee' }}>
-          <Typography variant="h6" color="text.secondary">
-            Doctors and services linked to this specialization will appear here...
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            Services in this Specialization ({services.length})
           </Typography>
+          
+          {isServicesLoading ? (
+            <CircularProgress size={24} />
+          ) : services.length > 0 ? (
+            <List>
+              {services.map((service) => (
+                <ListItem 
+                  key={service.id} 
+                  sx={{ 
+                    bgcolor: '#f9f9f9', 
+                    mb: 1, 
+                    borderRadius: 1, 
+                    cursor: 'pointer',
+                    '&:hover': { bgcolor: '#f0f0f0' } 
+                  }}
+                  onClick={() => navigate(`/services/${service.id}`)}
+                >
+                  <ListItemText 
+                    primary={service.name} 
+                    secondary={`Price: $${service.price.toFixed(2)}`}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography color="text.secondary">
+              No services are currently linked to this specialization.
+            </Typography>
+          )}
         </Box>
       </Paper>
 
