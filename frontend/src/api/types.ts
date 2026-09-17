@@ -1,5 +1,10 @@
-export type Roles = 'Patient' | 'Doctor' | 'Administrator' | number;
+export const Roles = {
+  Patient: 0,
+  Doctor: 1,
+  Administrator: 2,
+} as const;
 
+export type Roles = (typeof Roles)[keyof typeof Roles];
 export interface LogInUserRequest {
   username: string;
   password: string;
@@ -9,10 +14,17 @@ export interface LogOutUserRequest {
   code: string;
 }
 
+export interface RefreshTokenRequest {
+  refreshToken: string;
+}
+
 export interface RegisterUserRequest {
-  username: string;
-  password: string;
   email: string;
+  password: string;
+  firstname: string;
+  lastname: string;
+  phoneNumber: string;
+  birthday: string;
   role: Roles;
 }
 
