@@ -2,22 +2,19 @@ import { apiClient } from './../axios';
 import type * as Dtos from './../types';
 
 export const patientsApi = {
-  create: async (dto: Dtos.RegisterPatientDto, userId: string): Promise<Dtos.PatientDto> => {
-    const response = await apiClient.post<Dtos.PatientDto>('/patients', dto, {
-      headers: { 'X-User-Id': userId }
-    });
+
+  create: async (dto: Dtos.RegisterPatientDto): Promise<Dtos.PatientDto> => {
+    const response = await apiClient.post<Dtos.PatientDto>('/patients', dto);
+    return response.data;
+  },
+
+  update: async (dto: Dtos.EditPatientProfileDto): Promise<Dtos.PatientDto> => {
+    const response = await apiClient.put<Dtos.PatientDto>('/patients', dto);
     return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/patients/${id}`);
-  },
-
-  update: async (dto: Dtos.EditPatientProfileDto, userId: string): Promise<Dtos.PatientDto> => {
-    const response = await apiClient.put<Dtos.PatientDto>('/patients', dto, {
-      headers: { 'X-User-Id': userId }
-    });
-    return response.data;
   },
 
   getById: async (id: string): Promise<Dtos.PatientDto> => {

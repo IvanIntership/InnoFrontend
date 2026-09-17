@@ -2,22 +2,19 @@ import { apiClient } from './../axios';
 import type * as Dtos from './../types';
 
 export const administratorsApi = {
-  create: async (dto: Dtos.CreateAdministratorDto, userId: string): Promise<Dtos.AdministratorDto> => {
-    const response = await apiClient.post<Dtos.AdministratorDto>('/administrators', dto, {
-      headers: { 'X-User-Id': userId }
-    });
+
+  create: async (dto: Dtos.CreateAdministratorDto): Promise<Dtos.AdministratorDto> => {
+    const response = await apiClient.post<Dtos.AdministratorDto>('/administrators', dto);
+    return response.data;
+  },
+  
+  update: async (dto: Dtos.EditAdministratorProfileDto): Promise<Dtos.AdministratorDto> => {
+    const response = await apiClient.put<Dtos.AdministratorDto>('/administrators', dto);
     return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/administrators/${id}`);
-  },
-
-  update: async (dto: Dtos.EditAdministratorProfileDto, userId: string): Promise<Dtos.AdministratorDto> => {
-    const response = await apiClient.put<Dtos.AdministratorDto>('/administrators', dto, {
-      headers: { 'X-User-Id': userId }
-    });
-    return response.data;
   },
 
   getById: async (id: string): Promise<Dtos.AdministratorDto> => {

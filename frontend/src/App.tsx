@@ -9,31 +9,65 @@ import { SpecializationDetailsPage } from './pages/SpecializationDetailsPage';
 import { ServicesPage } from './pages/ServicesPage';
 import { ServiceDetailsPage } from './pages/ServiceDetailsPage';
 
+import { RegisterPatientForm } from './components/RegisterPatientForm';
+import { AuthCallback } from './components/AuthCallback';
+import { useAuthStore } from './store/authStore';
+import { useAuthActions } from './hooks/useAuthActions';
+
 function App() {
+  const { isAuthenticated, role } = useAuthStore();
+  const { login, logout } = useAuthActions();
+
   return (
     <div className="app-wrapper">
-      <header className="app-header">
-        <nav>
-          <ul style={{ display: 'flex', gap: '20px', listStyle: 'none', padding: '15px 20px', margin: 0 }}>
+      <header className="app-header" style={{ borderBottom: '1px solid #ccc' }}>
+        <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px' }}>
+          <ul style={{ display: 'flex', gap: '20px', listStyle: 'none', padding: '15px 0', margin: 0 }}>
             <li>
-              <Link to="/offices">Офисы</Link>
+              <Link to="/offices">Offices</Link>
             </li>
             <li>
-              <Link to="/categories">Категории услуг</Link>
+              <Link to="/categories">Service Categories</Link>
             </li>
             <li>
-              <Link to="/specializations">Специализации</Link>
+              <Link to="/specializations">Specializations</Link>
             </li>
             <li>
-              <Link to="/services">Услуги</Link>
+              <Link to="/services">Services</Link>
             </li>
+            {!isAuthenticated && (
+              <li>
+                <Link to="/register" style={{ fontWeight: 'bold' }}>Register</Link>
+              </li>
+            )}
           </ul>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            {isAuthenticated ? (
+              <>
+                <span style={{ fontSize: '14px', color: '#2e7d32' }}>
+                  <strong>Role:</strong> {role}
+                </span>
+                <button onClick={logout} style={{ padding: '6px 12px', cursor: 'pointer' }}>
+                  Log out
+                </button>
+              </>
+            ) : (
+              <button onClick={login} style={{ padding: '6px 12px', cursor: 'pointer' }}>
+                Log in (Keycloak)
+              </button>
+            )}
+          </div>
         </nav>
       </header>
 
-      <main className="main-content">
+      <main className="main-content" style={{ padding: '20px' }}>
         <Routes>
           <Route path="/" element={<Navigate to="/specializations" replace />} />
+
+          {/* Public authentication routes */}
+          <Route path="/register" element={<RegisterPatientForm />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
 
           <Route path="/offices">
             <Route index element={<OfficesPage />} />
